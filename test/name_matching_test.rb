@@ -1,6 +1,4 @@
-require 'rubygems'
-require 'test/unit'
-require 'mocha'
+require File::join(File::dirname(__FILE__), 'test_helper')
 require 'active_service'
 
 class FakeService < ActiveService::Base
@@ -15,5 +13,7 @@ class NameMatchingTest < Test::Unit::TestCase
     block.call
   end
 
-  
+  def test_true
+    true
+  end
 end

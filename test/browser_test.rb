@@ -1,4 +1,4 @@
-require 'test_helper'
+require File::join(File::dirname(__FILE__), 'test_helper')
 require 'active_service/browser'
 
 class BrowserTest < Test::Unit::TestCase
