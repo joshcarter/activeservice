@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'service_browser'
+require 'active_service/browser'
 
 Thread::abort_on_exception = true
 
@@ -37,7 +37,7 @@ end
 
 class ServiceBrowserTest < Test::Unit::TestCase
   def setup
-    @browser = ServiceBrowser.new(ServiceProvider::TYPE, ServiceProvider::PROTOCOL)
+    @browser = ActiveService::Browser.new(ServiceProvider::TYPE, ServiceProvider::PROTOCOL)
   end
 
   def teardown

@@ -11,14 +11,13 @@ Rake::TestTask.new :test do |test|
 end
 
 gem_spec = Gem::Specification.new do |spec|
-  spec.name = 'liveresource'
+  spec.name = 'activeservice'
   spec.version = '0.0.1'
-  spec.summary = 'Live Resource'
+  spec.summary = 'Active Service'
   spec.author = 'Josh Carter <public@joshcarter.com>'
   spec.has_rdoc = false
   candidates = Dir.glob("{lib}/**/*")
   spec.files = candidates.delete_if {|c| c.match(/\.swp|\.svn|html|pkg/)}
-  spec.add_dependency('ruby_protobuf')
   spec.add_dependency('dnssd')
   spec.add_dependency('mocha')
 end
