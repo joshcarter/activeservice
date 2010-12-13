@@ -35,7 +35,7 @@ class ServiceProvider
   end
 end
 
-class ServiceBrowserTest < Test::Unit::TestCase
+class BrowserTest < Test::Unit::TestCase
   def setup
     @browser = ActiveService::Browser.new(ServiceProvider::TYPE, ServiceProvider::PROTOCOL)
   end
