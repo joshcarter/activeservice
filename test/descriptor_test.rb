@@ -1,6 +1,4 @@
-require 'rubygems'
-require 'mocha'
-require 'test/unit'
+require 'test_helper'
 require 'active_service/descriptor'
 
 class DescriptorTest < Test::Unit::TestCase

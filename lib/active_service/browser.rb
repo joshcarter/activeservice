@@ -53,5 +53,9 @@ module ActiveService
     def [](name)
       @cache[name]
     end
+    
+    def all
+      @cache
+    end
   end
 end

@@ -1,7 +1,5 @@
-require File::join(File::dirname(__FILE__), 'resource_compiler')
-require File::join(File::dirname(__FILE__), 'connection_tcp')
-require File::join(File::dirname(__FILE__), 'server_tcp')
-require File::join(File::dirname(__FILE__), 'client_tcp')
-require File::join(File::dirname(__FILE__), 'simple_message_codec')
+require File::join(File::dirname(__FILE__), 'active_service', 'browser')
+require File::join(File::dirname(__FILE__), 'active_service', 'descriptor')
 
-
+module ActiveService
+end
