@@ -1,19 +1,43 @@
 require File::join(File::dirname(__FILE__), 'test_helper')
 require 'active_service'
 
-class FakeService < ActiveService::Base
+class DessertService < ActiveService::Base
+  self.type = 'desserts'
+  self.protocol = 'tcp'
+
+  # Take everything.
+  self.name_filter = nil
+end
+
+class IceCreamService < ActiveService::Base
+  self.type = 'desserts'
+  self.protocol = 'tcp'
+  self.name_filter = /Ice Cream$/
 end
 
 class NameMatchingTest < Test::Unit::TestCase
-  # Helper method to run a block with a certain number of services present.
-  def with_services(n, &block)
-    services = ["Vanilla Ice Cream", "Chocolate Ice Cream", "Tiramisu"]
-    FakeService.stubs(:find).with(:all).returns(services)
+  def setup
+    @descriptors = []
+    
+    ["Vanilla Ice Cream", "Chocolate Ice Cream", "Tiramisu"].each do |name|
+      @descriptors << ActiveService::Descriptor.new(:name => name)      
+    end
+    
+    @browser = Object.new
+    @browser.stubs(:all).returns(@descriptors)
 
-    block.call
+    ActiveService::Browser.expects(:new).with('desserts', 'tcp').returns(@browser)
   end
 
-  def test_true
-    true
+  def test_no_name_matcher_discovers_all_services
+    services = DessertService.find(:all)
+    assert_equal 3, services.length
+  end
+
+  def test_name_matcher_prunes_services
+    services = IceCreamService.find(:all)
+    assert_equal 2, services.length
+    assert_not_nil services.find { |s| s.name == "Vanilla Ice Cream" }
+    assert_not_nil services.find { |s| s.name == "Chocolate Ice Cream" }
   end
 end

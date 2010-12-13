@@ -10,7 +10,7 @@ TODO: further detail here
 - Late binding
 - Instance name matching
 
-Sample use:
+Sample use, in this case with a one-to-one mapping between an advertised service and the objects it should create:
 
     # Service wrapper for Redis. Assumes master Redis server(s) adversise
     # themselves with a DNS-SD type of "_redis._tcp".
@@ -54,3 +54,32 @@ Sample use:
     RedisService.each do |redis|
       redis['foo'] = 'bar'
     end
+
+Some services represent many client objects, for example accessing a CIM object manager could create a whole pile of CIM instances:
+
+    class LogicalPort < ActiveCim::Base
+      self.cim_class_name = CIM_LogicalPort
+    end
+
+    class CimService < ActiveService::Base
+      self.type = 'cimxml'
+
+      def self.create_instance(descriptor)
+        # Simply return the service descriptor itself.
+        descriptor
+      end
+
+      def self.logical_ports
+        CimService.with_exactly_one do |descriptor|
+          site = "http://#{descriptor[:host]}:#{descriptor[:port]}/root/cimv2"
+          LogicalPort.find(:all, :site => site)
+        end
+      end
+    end
+    
+    CimService.logical_ports.each do |port|
+      puts port.device_id
+    end
+    
+    
+    
