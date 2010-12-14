@@ -9,13 +9,16 @@ pick network services dynamically.
 
 [1]: http://www.dns-sd.org/
 
-TODO: further detail here
+Background
+----------
 
-- Late binding
-- Instance name matching
+Many applications (particularly in server environments) use static configurations, either coming from config files or -- let's be honest -- hard coded in the application:
 
-Sample use, in this case with a one-to-one mapping between an
-advertised service and the objects it should create:
+    Redis.new(:host => "redis.acme.com", :port => 6389)
+
+However, what your code *really* cares about is not so much the host, but rather the service you're trying to access. Just as DNS solves the problem of mapping a descriptive host name to an IP address, DNS-SD (service discovery) solves the problem of mapping a descriptive service name and type to a host name and port. DNS-SD is more fully described in the book [Zero Configuration Networking: The Definitive Guide][2].
+
+In the example above, you could use a DNS-SD publisher like Avahi to advertise the services it provides. (See sample config file below.) The DNS-SD gem allows you to browse and select services; the role of ActiveService is to do the common legwork for you. You just need to create a class that represents the service you want to access, for example:
 
     # Service wrapper for Redis. Assumes master Redis server(s) adversise
     # themselves with a DNS-SD type of "_redis._tcp".
@@ -30,35 +33,61 @@ advertised service and the objects it should create:
       def self.create_instance(descriptor)
         Redis.new(:host => descriptor.host, :port => descriptor.port)
       end
-      
+  
       # Service may optionally provide this method if there's any cleanup
       # needed for the instances created in create_instance.
       def self.destroy_instance(instance)
         # Nothing needed, Redis objects clean up on their own
       end
     end
-    
-    # ...application code...
-    
+
+Key things to note: in this example the service type is "redis" and you use it by creating a Redis object. You could then use this class in your application like so:
+
+    RedisService.with_one do |redis|
+      redis['foo'] = 'bar'
+    end
+
+Before the block executes, DNS-SD is consulted to find all services of the correct type, and (in this case) a random one is chosen. Within the context of the block, the Redis client object is ready for use. Next time you need to access the service, consult your service class again. Service browsing and resolution run in a separate thread, so your application's code is always using cached values.
+
+Selecting Services by Name
+--------------------------
+
+In a user-facing application, the common use case is DNS-SD would select all services matching a given type, then let the user select the desired *instance* of the service by a human-readable name. In a server environment, you (probably) want your application to automatically select the right service.
+
+Using Multiple Service Instances
+--------------------------------
+
+TODO: more here
+
     # Pick a service instance, any will do.
     RedisService.with_one do |redis|
       redis['foo'] = 'bar'
       redis['bar'] = 'baz'
     end
-    
+
     # Expect *exactly* one service on the network; for example in
     # master/slave configurations only the master should be publishing
     # a service record.
     RedisService.with_exactly_one do |redis|
       redis['foo'] = 'bar'
     end
-    
+
     # Do something with each service on the network. (Don't try to use
     # this for poor-man's high availability, unless you really know what
     # you're doing.)
     RedisService.each do |redis|
       redis['foo'] = 'bar'
     end
+
+
+Late Binding
+------------
+
+TODO: more here
+
+
+Multiple Client Objects for a Service
+-------------------------------------
 
 Some services represent many client objects, for example accessing a
 CIM object manager could create a whole pile of CIM instances. In this
@@ -87,6 +116,9 @@ situation, it would make sense to do something more like the following:
     CimService.network_ports.each do |port|
       puts port.name
     end
+
+Sample Avahi Configuration
+--------------------------
 
 Sample Avahi configuration file for Redis service on Linux/BSD:
 

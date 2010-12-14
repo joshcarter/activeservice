@@ -66,8 +66,11 @@ class EnumerationTest < Test::Unit::TestCase
         end
       end
 
-      FakeService.with_one do |service|
-        assert (service == "Service 1") or (service == "Service 2")
+      # (Very nearly) ensure we hit both services.
+      100.times do
+        FakeService.with_one do |service|
+          assert (service == "Service 1") || (service == "Service 2")
+        end
       end
 
       count = 0
