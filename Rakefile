@@ -10,6 +10,11 @@ Rake::TestTask.new :test do |test|
   test.test_files = ['test/*_test.rb']
 end
 
+Rake::TestTask.new "test:cim" do |test|
+  test.verbose = false
+  test.test_files = ['test/cim/*_test.rb']
+end
+
 gem_spec = Gem::Specification.new do |spec|
   spec.name = 'activeservice'
   spec.version = '1.0.0'

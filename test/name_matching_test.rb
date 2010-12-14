@@ -17,10 +17,10 @@ end
 
 class NameMatchingTest < Test::Unit::TestCase
   def setup
-    @descriptors = []
+    @descriptors = Hash.new
     
     ["Vanilla Ice Cream", "Chocolate Ice Cream", "Tiramisu"].each do |name|
-      @descriptors << ActiveService::Descriptor.new(:name => name)      
+      @descriptors[name] = ActiveService::Descriptor.new(:name => name)
     end
     
     @browser = Object.new

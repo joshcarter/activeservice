@@ -1,7 +1,11 @@
 ActiveService
 =============
 
-ActiveService is a lightweight framework built on [DNS Service Discovery][1], a/k/a the top level of Zeroconf/Bonjour. It allows you to easily define clients to network services, allowing your application to skip all the host/port configuration gunk, and instead pick network services dynamically.
+ActiveService is a lightweight framework built on [DNS Service
+Discovery][1], a/k/a the top level of Zeroconf/Bonjour. It allows you
+to easily define clients to network services, allowing your
+application to skip all the host/port configuration gunk, and instead
+pick network services dynamically.
 
 [1]: http://www.dns-sd.org/
 
@@ -10,7 +14,8 @@ TODO: further detail here
 - Late binding
 - Instance name matching
 
-Sample use, in this case with a one-to-one mapping between an advertised service and the objects it should create:
+Sample use, in this case with a one-to-one mapping between an
+advertised service and the objects it should create:
 
     # Service wrapper for Redis. Assumes master Redis server(s) adversise
     # themselves with a DNS-SD type of "_redis._tcp".
@@ -55,31 +60,31 @@ Sample use, in this case with a one-to-one mapping between an advertised service
       redis['foo'] = 'bar'
     end
 
-Some services represent many client objects, for example accessing a CIM object manager could create a whole pile of CIM instances:
+Some services represent many client objects, for example accessing a
+CIM object manager could create a whole pile of CIM instances. In this
+situation, it would make sense to do something more like the following:
 
-    class LogicalPort < ActiveCim::Base
-      self.cim_class_name = CIM_LogicalPort
+		class NetworkPort < ActiveCim::Base
+		  self.cim_class_name = "CIM_NetworkPort"
+		end
+
+		class CimService < ActiveService::Base
+		  self.type = 'cimxml'
+
+		  def self.create_instance(descriptor)
+		    # Simply return the service descriptor itself.
+		    descriptor
+		  end
+
+		  def self.network_ports
+		    CimService.with_exactly_one do |descriptor|
+		      site = "http://#{descriptor.host}:#{descriptor.port}/root/cimv2"
+		      NetworkPort.find(:all, :site => site)
+		    end
+		  end
     end
 
-    class CimService < ActiveService::Base
-      self.type = 'cimxml'
-
-      def self.create_instance(descriptor)
-        # Simply return the service descriptor itself.
-        descriptor
-      end
-
-      def self.logical_ports
-        CimService.with_exactly_one do |descriptor|
-          site = "http://#{descriptor[:host]}:#{descriptor[:port]}/root/cimv2"
-          LogicalPort.find(:all, :site => site)
-        end
-      end
+    CimService.network_ports.each do |port|
+      puts port.name
     end
-    
-    CimService.logical_ports.each do |port|
-      puts port.device_id
-    end
-    
-    
-    
+

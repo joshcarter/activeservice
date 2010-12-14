@@ -12,26 +12,37 @@ module ActiveService
     @@browser = nil
     
     class << self
-      attr_accessor :name_filter, :type, :protocol
+      attr_accessor :name_filter, :type, :protocol, :timeout
     end
 
     def self.browser
       # Lazy create the browser so client has time to initialize 
       # stuff like the type and protocol.
       @@browser ||= Browser.new(type, protocol || 'tcp')
-      @@browser
     end
     
     def self.find(conditions)
       raise "find() only supports find(:all)" if (conditions != :all)
+
+      abort_time = Time.now.to_f + (timeout || 1.0)
+
+      loop do
+        descriptors = browser.all.values
       
-      descriptors = browser.all
-      
-      if name_filter != nil
-        descriptors = descriptors.select { |d| d.name.match(name_filter) }
+        if name_filter != nil
+          descriptors = descriptors.select { |d| d.name.match(name_filter) }
+        end
+
+        if descriptors.length > 0
+          return descriptors
+        else
+          # Need to wait until abort_time to see if we get any
+          # further browse results.
+          return [] if Time.now.to_f > abort_time
+
+          sleep 0.1
+        end
       end
-      
-      descriptors
     end
 
     def self.with_exactly_one(&block)

@@ -5,9 +5,11 @@ require 'active_service/descriptor'
 module ActiveService
   class Browser
     def initialize(type, protocol = 'tcp')
+      trace "browser initializing"
+
       @type = Descriptor.new(:type => type, :protocol => protocol)
       @cache = Hash.new
-      
+
       # Browse will call the block in a separate thread each time a
       # DNS-SD event is seen.
       @browser = DNSSD.browse(@type.type) do |reply|
