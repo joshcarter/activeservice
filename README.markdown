@@ -28,7 +28,7 @@ advertised service and the objects it should create:
       # specification. This is called every time find(), all(), with_*() are
       # used to access the services.
       def self.create_instance(descriptor)
-        Redis.new(:host => descriptor[:host])
+        Redis.new(:host => descriptor.host, :port => descriptor.port)
       end
       
       # Service may optionally provide this method if there's any cleanup
@@ -88,3 +88,17 @@ situation, it would make sense to do something more like the following:
       puts port.name
     end
 
+Sample Avahi configuration file for Redis service on Linux/BSD:
+
+    # File: /etc/avahi/services/redis.service
+
+    <?xml version="1.0" standalone='no'?>
+    <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+
+    <service-group>
+      <name replace-wildcards="yes">%h Redis Server</name>
+      <service>
+        <type>_redis._tcp</type>
+        <port>6379</port>
+      </service>
+    </service-group>

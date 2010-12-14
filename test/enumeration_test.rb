@@ -19,10 +19,23 @@ class EnumerationTest < Test::Unit::TestCase
 
   def test_enumeration_with_none_present
     with_services(0) do
+      # Both with_one and with_exactly_one should raise when no services
+      # are present.
       assert_raise(ActiveService::NoServicesRegistered) do
         FakeService.with_exactly_one do |service|
           assert false # Will not get here
         end
+      end
+
+      assert_raise(ActiveService::NoServicesRegistered) do
+        FakeService.with_one do |service|
+          assert false # Will not get here
+        end
+      end
+
+      # Each should not raise, but just do nothing.
+      FakeService.each do |service|
+        assert false # Will not get here
       end
     end
   end
@@ -32,6 +45,16 @@ class EnumerationTest < Test::Unit::TestCase
       FakeService.with_exactly_one do |service|
         assert_equal "Service 1", service
       end
+
+      FakeService.with_one do |service|
+        assert_equal "Service 1", service
+      end
+
+      count = 0
+      FakeService.each do |service|
+        count += 1
+      end
+      assert_equal 1, count
     end
   end
   
@@ -42,6 +65,16 @@ class EnumerationTest < Test::Unit::TestCase
           assert false # Will not get here
         end
       end
+
+      FakeService.with_one do |service|
+        assert (service == "Service 1") or (service == "Service 2")
+      end
+
+      count = 0
+      FakeService.each do |service|
+        count += 1
+      end
+      assert_equal 2, count
     end
   end
 end

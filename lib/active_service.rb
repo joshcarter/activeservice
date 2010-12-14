@@ -62,6 +62,40 @@ module ActiveService
         destroy_instance(instance)
       end
     end
+
+    def self.with_one(&block)
+      descriptors = find(:all)
+      instance = nil
+
+      if (descriptors.length == 0)
+        raise ActiveService::NoServicesRegistered.new("Expected exactly one service, none are registered")
+      end
+
+      begin
+        # Choose random service descriptor
+        descriptor = descriptors[rand(descriptors.length)]
+        
+        instance = create_instance(descriptor)
+        yield instance
+      ensure
+        destroy_instance(instance)
+      end
+    end
+
+    def self.each(&block)
+      descriptors = find(:all)
+
+      descriptors.each do |descriptor|
+        instance = nil
+        
+        begin
+          instance = create_instance(descriptors.first)
+          yield instance
+        ensure
+          destroy_instance(instance)
+        end
+      end
+    end
     
     # Subclasses must override this to create their service instance
     # matching the discovered network info.
