@@ -64,24 +64,24 @@ Some services represent many client objects, for example accessing a
 CIM object manager could create a whole pile of CIM instances. In this
 situation, it would make sense to do something more like the following:
 
-		class NetworkPort < ActiveCim::Base
-		  self.cim_class_name = "CIM_NetworkPort"
-		end
+    class NetworkPort < ActiveCim::Base
+      self.cim_class_name = "CIM_NetworkPort"
+    end
 
-		class CimService < ActiveService::Base
-		  self.type = 'cimxml'
+    class CimService < ActiveService::Base
+      self.type = 'cimxml'
 
-		  def self.create_instance(descriptor)
-		    # Simply return the service descriptor itself.
-		    descriptor
-		  end
+      def self.create_instance(descriptor)
+        # Simply return the service descriptor itself.
+        descriptor
+      end
 
-		  def self.network_ports
-		    CimService.with_exactly_one do |descriptor|
-		      site = "http://#{descriptor.host}:#{descriptor.port}/root/cimv2"
-		      NetworkPort.find(:all, :site => site)
-		    end
-		  end
+      def self.network_ports
+        CimService.with_exactly_one do |descriptor|
+          site = "http://#{descriptor.host}:#{descriptor.port}/root/cimv2"
+          NetworkPort.find(:all, :site => site)
+        end
+      end
     end
 
     CimService.network_ports.each do |port|
