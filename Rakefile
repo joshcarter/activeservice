@@ -33,7 +33,7 @@ gem_spec = Gem::Specification.new do |spec|
   candidates = Dir.glob("{lib}/**/*")
   spec.files = candidates.delete_if {|c| c.match(/\.swp|\.svn|html|pkg/)}
   spec.add_dependency('dnssd')
-  spec.add_dependency('mocha')
+  spec.add_development_dependency('mocha')
   
   spec.description = <<-EOF
     ActiveService is a high-level framework for dynamic service 
