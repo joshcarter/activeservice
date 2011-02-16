@@ -93,7 +93,7 @@ module ActiveService
         instance = nil
         
         begin
-          instance = create_instance(descriptors.first)
+          instance = create_instance(descriptor)
           yield instance
         ensure
           destroy_instance(instance)

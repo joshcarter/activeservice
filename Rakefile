@@ -22,7 +22,7 @@ end
 
 gem_spec = Gem::Specification.new do |spec|
   spec.name = 'activeservice'
-  spec.version = '1.0.1'
+  spec.version = '1.0.2'
   spec.summary = 'Active Service'
   spec.author = 'Josh Carter'
   spec.email = 'public@joshcarter.com'

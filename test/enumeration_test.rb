@@ -73,11 +73,11 @@ class EnumerationTest < Test::Unit::TestCase
         end
       end
 
-      count = 0
+      services = Array.new
       FakeService.each do |service|
-        count += 1
+        services << service
       end
-      assert_equal 2, count
+      assert_equal ["Service 1", "Service 2"], services.sort
     end
   end
 end
