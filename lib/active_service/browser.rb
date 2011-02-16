@@ -4,15 +4,22 @@ require 'active_service/descriptor'
 
 module ActiveService
   class Browser
-    def initialize(type, protocol = 'tcp')
+    def initialize(type, protocol = 'tcp', interface = nil)
       trace "browser initializing"
 
       @type = Descriptor.new(:type => type, :protocol => protocol)
       @cache = Hash.new
-
+      
+      # Need to convert interface name to a numeric index, if present
+      if interface
+        interface = DNSSD::interface_index interface
+      else
+        interface = DNSSD::InterfaceAny
+      end
+        
       # Browse will call the block in a separate thread each time a
       # DNS-SD event is seen.
-      @browser = DNSSD.browse(@type.type) do |reply|
+      @browser = DNSSD.browse(@type.type, nil, 0, interface) do |reply|
         handle_browse_reply(reply)
       end
     end

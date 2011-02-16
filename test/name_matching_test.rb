@@ -26,7 +26,7 @@ class NameMatchingTest < Test::Unit::TestCase
     @browser = Object.new
     @browser.stubs(:all).returns(@descriptors)
 
-    ActiveService::Browser.expects(:new).with('desserts', 'tcp').returns(@browser)
+    ActiveService::Browser.expects(:new).with('desserts', 'tcp', nil).returns(@browser)
   end
 
   def test_no_name_matcher_discovers_all_services
